@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance - Finance Dashboard</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Loading animation */
+        .fade-in-element {
+            opacity: 0;
+            animation: fade-in 0.5s ease-out forwards;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Style for the navigation boxes */
+        .finance-box {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            border-width: 1.5px;
+            position: relative; /* Needed for positioning the number */
+        }
+        .finance-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            color: white;
+        }
+        .finance-box .box-number {
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .finance-box:hover .box-number {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .sub-nav-button:hover {
+             background-color: #eff6ff; /* blue-50 */
+        }
+        /* Currency Toggle Styles */
+        .currency-toggle {
+            position: relative;
+            display: inline-flex;
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 9999px;
+            padding: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .currency-toggle-slider {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            height: 2rem;
+            width: 4rem;
+            background-color: white;
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        .currency-toggle[data-currency="USD"] .currency-toggle-slider {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 antialiased">
+
+    <div class="min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Header -->
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800">Personal Finance</h1>
+                    <p class="text-slate-500">Welcome back, Zubair!</p>
+                </div>
+                <a href="index.html" class="bg-white text-slate-700 font-semibold py-2 px-4 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                    &larr; Back to Dashboard
+                </a>
+            </header>
+
+            <!-- Main Navigation Boxes -->
+            <div class="relative">
+                <nav class="fade-in-element" style="animation-delay: 0.1s;">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        <button id="timeValueBtn" class="finance-box text-center bg-white p-4 rounded-xl shadow-sm font-semibold text-blue-600 border-blue-200 hover:bg-blue-600 hover:border-blue-600">
+                            <span class="box-number absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">1</span>
+                            Time Value of Money
+                        </button>
+                        <button id="incomeStatementBtn" class="finance-box text-center bg-white p-4 rounded-xl shadow-sm font-semibold text-red-600 border-red-200 hover:bg-red-600 hover:border-red-600">
+                            <span class="box-number absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-red-50 text-red-600 text-xs font-bold">2</span>
+                            Income Statement
+                        </button>
+                        <button id="budgetingBtn" class="finance-box text-center bg-white p-4 rounded-xl shadow-sm font-semibold text-green-600 border-green-200 hover:bg-green-600 hover:border-green-600">
+                            <span class="box-number absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-green-50 text-green-600 text-xs font-bold">3</span>
+                            Budgeting & Saving
+                        </button>
+                        <button id="debtBtn" class="finance-box text-center bg-white p-4 rounded-xl shadow-sm font-semibold text-yellow-600 border-yellow-200 hover:bg-yellow-500 hover:border-yellow-500">
+                             <span class="box-number absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-yellow-50 text-yellow-600 text-xs font-bold">4</span>
+                            Debt Management
+                        </button>
+                        <button id="investingBtn" class="finance-box text-center bg-white p-4 rounded-xl shadow-sm font-semibold text-purple-600 border-purple-200 hover:bg-purple-600 hover:border-purple-600">
+                             <span class="box-number absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-purple-50 text-purple-600 text-xs font-bold">5</span>
+                            Investing
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- Sub-navigation / Dropdown for Time Value of Money -->
+                <div id="tvmDropdown" class="hidden absolute top-full mt-2 w-full md:w-auto fade-in-element z-10">
+                     <div class="bg-white p-2 rounded-xl shadow-lg border border-slate-200">
+                        <div class="flex flex-col gap-1">
+                            <button id="dailySavingsBtn" class="sub-nav-button w-full text-center py-2 px-4 rounded-lg font-medium text-slate-700 hover:text-blue-700 transition-colors">Daily Savings (FV)</button>
+                            <button id="purchaseFvBtn" class="sub-nav-button w-full text-center py-2 px-4 rounded-lg font-medium text-slate-700 hover:text-blue-700 transition-colors">Big Purchase (FV)</button>
+                            <button id="moneyDoubleBtn" class="sub-nav-button w-full text-center py-2 px-4 rounded-lg font-medium text-slate-700 hover:text-blue-700 transition-colors">Money Double (x2)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Calculators Wrapper -->
+            <section id="calculatorsWrapper" class="mt-8">
+                
+                <!-- Calculator 1: Daily Savings (FV) -->
+                <div id="dailySavingsCalculator" class="calculator-content hidden">
+                    <div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md">
+                        <div class="flex items-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-3"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                            <h2 class="text-2xl font-bold text-slate-800">Daily Savings (FV)</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Currency</label>
+                                    <div id="ds_currency_toggle" data-currency="INR" class="currency-toggle mt-1">
+                                        <div class="currency-toggle-slider"></div>
+                                        <span class="relative z-10 w-16 h-8 flex items-center justify-center font-semibold text-slate-700">INR</span>
+                                        <span class="relative z-10 w-16 h-8 flex items-center justify-center font-semibold text-slate-700">USD</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="ds_dailyCost" id="ds_dailyCostLabel" class="block text-sm font-medium text-slate-700">Daily cost on tea/coffee/snacks (₹)</label>
+                                    <input type="number" id="ds_dailyCost" placeholder="e.g., 150" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="ds_years" class="block text-sm font-medium text-slate-700">Number of years</label>
+                                    <input type="number" id="ds_years" placeholder="e.g., 30" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="ds_annualRate" class="block text-sm font-medium text-slate-700">Annual interest rate (%)</label>
+                                    <input type="number" id="ds_annualRate" placeholder="e.g., 12" step="0.1" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-6 rounded-lg flex flex-col justify-center items-center text-center space-y-4">
+                                <div class="w-full bg-white border border-slate-200 p-4 rounded-lg">
+                                    <p class="text-sm text-slate-500">Money saved monthly</p>
+                                    <p id="ds_monthlySavings" class="text-2xl font-bold text-slate-800">₹0</p>
+                                </div>
+                                <div class="w-full bg-white border border-slate-200 p-4 rounded-lg">
+                                    <p id="ds_futureValueSingleLabel" class="text-sm font-medium text-green-700">Value in 0 years</p>
+                                    <p id="ds_futureValueSingle" class="text-3xl font-bold text-green-600">₹0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Visualization -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-slate-700 mb-2">Investment Growth Over Time</h3>
+                            <canvas id="ds_chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculator 2: Big Purchase (FV) -->
+                <div id="purchaseFvCalculator" class="calculator-content hidden">
+                    <div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md">
+                        <div class="flex items-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-3"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            <h2 class="text-2xl font-bold text-slate-800">Big Purchase (FV)</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                               <div>
+                                    <label class="block text-sm font-medium text-slate-700">Currency</label>
+                                    <div id="fv_currency_toggle" data-currency="INR" class="currency-toggle mt-1">
+                                        <div class="currency-toggle-slider"></div>
+                                        <span class="relative z-10 w-16 h-8 flex items-center justify-center font-semibold text-slate-700">INR</span>
+                                        <span class="relative z-10 w-16 h-8 flex items-center justify-center font-semibold text-slate-700">USD</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="fv_itemName" class="block text-sm font-medium text-slate-700">Item Name</label>
+                                    <input type="text" id="fv_itemName" placeholder="e.g., iPhone" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="fv_itemCost" id="fv_itemCostLabel" class="block text-sm font-medium text-slate-700">Cost of item (₹)</label>
+                                    <input type="number" id="fv_itemCost" placeholder="e.g., 150000" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="fv_years" class="block text-sm font-medium text-slate-700">Number of years</label>
+                                    <input type="number" id="fv_years" placeholder="e.g., 25" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="fv_annualRate" class="block text-sm font-medium text-slate-700">Annual interest rate (%)</label>
+                                    <input type="number" id="fv_annualRate" placeholder="e.g., 12" step="0.1" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-6 rounded-lg flex flex-col justify-center">
+                                <p id="fv_resultText" class="text-lg text-slate-600">If you saved <span class="font-bold">₹0</span> by not buying <span class="font-bold">the item</span>, the savings would be worth:</p>
+                                <p id="fv_futureValue" class="text-4xl font-bold text-green-600 mt-2">₹0</p>
+                                <p id="fv_yearsText" class="text-lg text-slate-600 mt-1">in 0 years!</p>
+                            </div>
+                        </div>
+                         <!-- Visualization -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-slate-700 mb-2">Investment Growth Over Time</h3>
+                            <canvas id="fv_chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calculator 3: Money Double (x2) -->
+                <div id="moneyDoubleCalculator" class="calculator-content hidden">
+                    <div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md">
+                        <div class="flex items-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-3"><path d="M2.5 14.5L8 9l4 4 7-7"/><polyline points="15 2 21 2 21 8"/></svg>
+                            <h2 class="text-2xl font-bold text-slate-800">Money Double (x2)</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Currency</label>
+                                    <div id="md_currency_toggle" data-currency="INR" class="currency-toggle mt-1">
+                                        <div class="currency-toggle-slider"></div>
+                                        <span class="relative z-10 w-16 h-8 flex items-center justify-center font-semibold text-slate-700">INR</span>
+                                        <span class="relative z-10 w-16 h-8 flex items-center justify-center font-semibold text-slate-700">USD</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="md_initialInvestment" id="md_initialInvestmentLabel" class="block text-sm font-medium text-slate-700">Initial Investment (₹)</label>
+                                    <input type="number" id="md_initialInvestment" placeholder="e.g., 10000" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="md_annualRate" class="block text-sm font-medium text-slate-700">Enter an interest rate (%)</label>
+                                    <input type="number" id="md_annualRate" placeholder="e.g., 9.5" step="0.1" class="mt-1 block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm">
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-6 rounded-lg flex flex-col justify-center items-center text-center">
+                                <div class="w-full bg-white border border-slate-200 p-4 rounded-lg">
+                                    <p class="text-sm text-slate-500">Years to double your money:</p>
+                                    <p id="md_yearsToDouble" class="text-3xl font-bold text-green-600">N/A</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Visualization -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-slate-700 mb-2">Investment Doubling Over Time</h3>
+                            <canvas id="md_chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Placeholders for other calculators -->
+                <div id="incomeStatementCalculator" class="calculator-content hidden"><div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md"><div class="flex items-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 mr-3"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg><h2 class="text-2xl font-bold text-slate-800">Income Statement Calculator</h2></div><p class="text-slate-500">Calculator coming soon...</p></div></div>
+                <div id="budgetingCalculator" class="calculator-content hidden"><div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md"><div class="flex items-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mr-3"><path d="M10 21h4m-2-4v4M4 4v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4M4 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2M4 4h16"/></svg><h2 class="text-2xl font-bold text-slate-800">Budgeting & Saving Calculator</h2></div><p class="text-slate-500">Calculator coming soon...</p></div></div>
+                <div id="debtCalculator" class="calculator-content hidden"><div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md"><div class="flex items-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-600 mr-3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 7v4h4"/><path d="M12 11h-4"/></svg><h2 class="text-2xl font-bold text-slate-800">Debt Management Calculator</h2></div><p class="text-slate-500">Calculator coming soon...</p></div></div>
+                <div id="investingCalculator" class="calculator-content hidden"><div class="fade-in-element bg-white p-6 rounded-xl border border-slate-200 shadow-md"><div class="flex items-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 mr-3"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg><h2 class="text-2xl font-bold text-slate-800">Investment Growth Calculator</h2></div><p class="text-slate-500">Calculator coming soon...</p></div></div>
+            </section>
+        </div>
+    </div>
+    
+    <script>
+        // --- Main Application Script ---
+        const navButtons = {
+            timeValueBtn: document.getElementById('timeValueBtn'),
+            incomeStatementBtn: document.getElementById('incomeStatementBtn'),
+            budgetingBtn: document.getElementById('budgetingBtn'),
+            debtBtn: document.getElementById('debtBtn'),
+            investingBtn: document.getElementById('investingBtn'),
+        };
+        
+        const tvmDropdown = document.getElementById('tvmDropdown');
+        const tvmButtons = {
+            dailySavingsBtn: document.getElementById('dailySavingsBtn'),
+            purchaseFvBtn: document.getElementById('purchaseFvBtn'),
+            moneyDoubleBtn: document.getElementById('moneyDoubleBtn'),
+        };
+
+        const calculators = {
+            dailySavings: document.getElementById('dailySavingsCalculator'),
+            purchaseFv: document.getElementById('purchaseFvCalculator'),
+            moneyDouble: document.getElementById('moneyDoubleCalculator'),
+            incomeStatement: document.getElementById('incomeStatementCalculator'),
+            budgeting: document.getElementById('budgetingCalculator'),
+            debt: document.getElementById('debtCalculator'),
+            investing: document.getElementById('investingCalculator'),
+        };
+
+        const allCalculators = document.querySelectorAll('.calculator-content');
+        const calculatorsWrapper = document.getElementById('calculatorsWrapper');
+
+        let dsChartInstance;
+        let fvChartInstance;
+        let mdChartInstance;
+
+        function showCalculator(calculatorToShow) {
+            allCalculators.forEach(calc => calc.classList.add('hidden'));
+            if (calculatorToShow) {
+                calculatorToShow.classList.remove('hidden');
+                calculatorsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function hideAllCalculatorsAndDropdowns() {
+            allCalculators.forEach(calc => calc.classList.add('hidden'));
+            tvmDropdown.classList.add('hidden');
+        }
+
+        // --- Main Navigation Logic ---
+        navButtons.timeValueBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isHidden = tvmDropdown.classList.contains('hidden');
+            hideAllCalculatorsAndDropdowns();
+            if(isHidden) tvmDropdown.classList.remove('hidden');
+        });
+        navButtons.incomeStatementBtn.addEventListener('click', (e) => { e.preventDefault(); hideAllCalculatorsAndDropdowns(); showCalculator(calculators.incomeStatement); });
+        navButtons.budgetingBtn.addEventListener('click', (e) => { e.preventDefault(); hideAllCalculatorsAndDropdowns(); showCalculator(calculators.budgeting); });
+        navButtons.debtBtn.addEventListener('click', (e) => { e.preventDefault(); hideAllCalculatorsAndDropdowns(); showCalculator(calculators.debt); });
+        navButtons.investingBtn.addEventListener('click', (e) => { e.preventDefault(); hideAllCalculatorsAndDropdowns(); showCalculator(calculators.investing); });
+
+        // --- TVM Dropdown Logic ---
+        tvmButtons.dailySavingsBtn.addEventListener('click', () => {
+            showCalculator(calculators.dailySavings);
+            tvmDropdown.classList.add('hidden');
+        });
+        tvmButtons.purchaseFvBtn.addEventListener('click', () => {
+            showCalculator(calculators.purchaseFv)
+            tvmDropdown.classList.add('hidden');
+        });
+        tvmButtons.moneyDoubleBtn.addEventListener('click', () => {
+            showCalculator(calculators.moneyDouble)
+            tvmDropdown.classList.add('hidden');
+        });
+
+
+        // --- Calculator 1: Daily Savings ---
+        const ds_ctx = document.getElementById('ds_chart').getContext('2d');
+        const ds_currency_toggle = document.getElementById('ds_currency_toggle');
+        const ds_dailyCostLabel = document.getElementById('ds_dailyCostLabel');
+        const ds_dailyCost = document.getElementById('ds_dailyCost');
+        const ds_years = document.getElementById('ds_years');
+        const ds_annualRate = document.getElementById('ds_annualRate');
+        const ds_monthlySavings = document.getElementById('ds_monthlySavings');
+        const ds_futureValueSingle = document.getElementById('ds_futureValueSingle');
+        const ds_futureValueSingleLabel = document.getElementById('ds_futureValueSingleLabel');
+
+        function calculateDailySavingsFV() {
+            const currency = ds_currency_toggle.dataset.currency;
+            const dailyCost = parseFloat(ds_dailyCost.value) || 0;
+            const years = parseInt(ds_years.value) || 0;
+            const annualRate = parseFloat(ds_annualRate.value) || 0;
+            const monthlySavings = dailyCost * 30;
+            const monthlyRate = (annualRate / 100) / 12;
+            const formatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            ds_dailyCostLabel.textContent = `Daily cost on tea/coffee/snacks (${currency === 'USD' ? '$' : '₹'})`;
+            ds_monthlySavings.textContent = formatter.format(monthlySavings);
+            
+            let futureValue = 0;
+            if (monthlyRate > 0) {
+                futureValue = monthlySavings * (Math.pow(1 + monthlyRate, years * 12) - 1) / monthlyRate;
+            } else {
+                futureValue = monthlySavings * (years * 12);
+            }
+            
+            ds_futureValueSingle.textContent = formatter.format(futureValue);
+            ds_futureValueSingleLabel.textContent = `Value in ${years} years`;
+
+            // Chart Data
+            const labels = ['Year 0'];
+            const futureValueData = [0];
+            const investedData = [0];
+
+            for (let i = 1; i <= years; i++) {
+                labels.push(`Year ${i}`);
+                const numberOfMonths = i * 12;
+                let fv = monthlyRate > 0 ? monthlySavings * (Math.pow(1 + monthlyRate, numberOfMonths) - 1) / monthlyRate : monthlySavings * numberOfMonths;
+                futureValueData.push(fv);
+                investedData.push(monthlySavings * numberOfMonths);
+            }
+            updateDsChart(labels, futureValueData, investedData, currency, annualRate);
+        }
+        
+        function updateDsChart(labels, futureValueData, investedData, currency, annualRate) {
+            if (dsChartInstance) {
+                dsChartInstance.destroy();
+            }
+            
+            const futureValueBorderColor = annualRate > 0 ? '#16a34a' : '#2563eb';
+            const gradient = ds_ctx.createLinearGradient(0, 0, 0, 400);
+            if (annualRate > 0) {
+                gradient.addColorStop(0, 'rgba(22, 163, 74, 0.5)');
+                gradient.addColorStop(1, 'rgba(22, 163, 74, 0)');
+            } else {
+                 gradient.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
+                 gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+            }
+
+
+            dsChartInstance = new Chart(ds_ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Future Value`,
+                        data: futureValueData,
+                        borderColor: futureValueBorderColor,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBorderColor: futureValueBorderColor,
+                    },
+                    {
+                        label: `Total Invested`,
+                        data: investedData,
+                        borderColor: '#2563eb', // blue-600
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#2563eb',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: { 
+                        y: { 
+                            ticks: { 
+                                callback: value => new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, notation: 'compact' }).format(value) 
+                            } 
+                        } 
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const value = context.parsed.y;
+                                    if (value !== null) {
+                                        if (currency === 'INR' && value >= 100000) {
+                                            label += '₹' + (value / 100000).toFixed(2) + ' L';
+                                        } else {
+                                            label += new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        ds_currency_toggle.addEventListener('click', () => {
+            const current = ds_currency_toggle.dataset.currency;
+            ds_currency_toggle.dataset.currency = current === 'INR' ? 'USD' : 'INR';
+            calculateDailySavingsFV();
+        });
+        [ds_dailyCost, ds_years, ds_annualRate].forEach(el => el.addEventListener('input', calculateDailySavingsFV));
+        
+
+        // --- Calculator 2: Purchase Future Value ---
+        const fv_ctx = document.getElementById('fv_chart').getContext('2d');
+        const fv_currency_toggle = document.getElementById('fv_currency_toggle');
+        const fv_itemName = document.getElementById('fv_itemName');
+        const fv_itemCost = document.getElementById('fv_itemCost');
+        const fv_itemCostLabel = document.getElementById('fv_itemCostLabel');
+        const fv_years = document.getElementById('fv_years');
+        const fv_annualRate = document.getElementById('fv_annualRate');
+        const fv_resultText = document.getElementById('fv_resultText');
+        const fv_futureValue = document.getElementById('fv_futureValue');
+        const fv_yearsText = document.getElementById('fv_yearsText');
+
+        function calculatePurchaseFV() {
+            const currency = fv_currency_toggle.dataset.currency;
+            const itemName = fv_itemName.value || "the item";
+            const itemCost = parseFloat(fv_itemCost.value) || 0;
+            const years = parseInt(fv_years.value) || 0;
+            const annualRate = parseFloat(fv_annualRate.value) / 100 || 0;
+            const futureValue = itemCost * Math.pow(1 + annualRate, years);
+            const formatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            
+            fv_itemCostLabel.textContent = `Cost of item (${currency === 'USD' ? '$' : '₹'})`;
+            fv_resultText.innerHTML = `If you saved <span class="font-bold">${formatter.format(itemCost)}</span> by not buying <span class="font-bold">${itemName}</span>, the savings would be worth:`;
+            fv_futureValue.textContent = formatter.format(futureValue);
+            fv_yearsText.textContent = `in ${years} years!`;
+
+            // Chart Data
+            const labels = ['Year 0'];
+            const futureValueData = [itemCost];
+            const investedData = [itemCost];
+
+            for (let i = 1; i <= years; i++) {
+                labels.push(`Year ${i}`);
+                futureValueData.push(itemCost * Math.pow(1 + annualRate, i));
+                investedData.push(itemCost);
+            }
+            updateFvChart(labels, futureValueData, investedData, currency, annualRate);
+        }
+
+        function updateFvChart(labels, futureValueData, investedData, currency, annualRate) {
+            if (fvChartInstance) {
+                fvChartInstance.destroy();
+            }
+
+            const futureValueBorderColor = annualRate > 0 ? '#16a34a' : '#2563eb';
+            const gradient = fv_ctx.createLinearGradient(0, 0, 0, 400);
+             if (annualRate > 0) {
+                gradient.addColorStop(0, 'rgba(22, 163, 74, 0.5)');
+                gradient.addColorStop(1, 'rgba(22, 163, 74, 0)');
+            } else {
+                 gradient.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
+                 gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+            }
+
+            fvChartInstance = new Chart(fv_ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Future Value`,
+                        data: futureValueData,
+                        borderColor: futureValueBorderColor,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBorderColor: futureValueBorderColor,
+                    },
+                    {
+                        label: `Amount Invested`,
+                        data: investedData,
+                        borderColor: '#2563eb', // blue-600
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#2563eb',
+                    }]
+                },
+                 options: {
+                    responsive: true,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: { 
+                        y: { 
+                            ticks: { 
+                                callback: value => new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, notation: 'compact' }).format(value) 
+                            } 
+                        } 
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const value = context.parsed.y;
+                                    if (value !== null) {
+                                        if (currency === 'INR' && value >= 100000) {
+                                            label += '₹' + (value / 100000).toFixed(2) + ' L';
+                                        } else {
+                                            label += new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        fv_currency_toggle.addEventListener('click', () => {
+            const current = fv_currency_toggle.dataset.currency;
+            fv_currency_toggle.dataset.currency = current === 'INR' ? 'USD' : 'INR';
+            calculatePurchaseFV();
+        });
+        [fv_itemName, fv_itemCost, fv_years, fv_annualRate].forEach(el => el.addEventListener('input', calculatePurchaseFV));
+        
+        // --- Calculator 3: Money Double ---
+        const md_ctx = document.getElementById('md_chart').getContext('2d');
+        const md_currency_toggle = document.getElementById('md_currency_toggle');
+        const md_initialInvestment = document.getElementById('md_initialInvestment');
+        const md_initialInvestmentLabel = document.getElementById('md_initialInvestmentLabel');
+        const md_annualRate = document.getElementById('md_annualRate');
+        const md_yearsToDouble = document.getElementById('md_yearsToDouble');
+
+        function calculateMoneyDouble() {
+            const annualRate = parseFloat(md_annualRate.value) || 0;
+            const initialInvestment = parseFloat(md_initialInvestment.value) || 0;
+            const currency = md_currency_toggle.dataset.currency;
+            
+            let years = 0;
+            if (annualRate > 0) {
+                years = Math.log(2) / Math.log(1 + (annualRate / 100));
+                md_yearsToDouble.textContent = years.toFixed(1) + ' years';
+            } else {
+                md_yearsToDouble.textContent = 'N/A';
+            }
+
+            md_initialInvestmentLabel.textContent = `Initial Investment (${currency === 'USD' ? '$' : '₹'})`;
+
+            // Chart Data
+            const labels = ['Start'];
+            const data = [initialInvestment];
+            
+            if (years > 0) {
+                labels.push(`After ${years.toFixed(1)} yrs`);
+                data.push(initialInvestment * 2);
+                labels.push(`After ${(years * 2).toFixed(1)} yrs`);
+                data.push(initialInvestment * 4);
+                labels.push(`After ${(years * 3).toFixed(1)} yrs`);
+                data.push(initialInvestment * 8);
+            }
+            updateMdChart(labels, data, currency);
+        }
+
+        function updateMdChart(labels, data, currency) {
+             if (mdChartInstance) {
+                mdChartInstance.destroy();
+            }
+            mdChartInstance = new Chart(md_ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Investment Value`,
+                        data: data,
+                        backgroundColor: ['#3b82f6', '#16a34a', '#16a34a', '#16a34a'],
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (value !== null) {
+                                        if (currency === 'INR' && value >= 100000) {
+                                            return '₹' + (value / 100000).toFixed(2) + ' L';
+                                        } else {
+                                            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+                                        }
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: value => new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, notation: 'compact' }).format(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        md_currency_toggle.addEventListener('click', () => {
+            const current = md_currency_toggle.dataset.currency;
+            md_currency_toggle.dataset.currency = current === 'INR' ? 'USD' : 'INR';
+            calculateMoneyDouble();
+        });
+        [md_annualRate, md_initialInvestment].forEach(el => el.addEventListener('input', calculateMoneyDouble));
+
+
+        // Initial calculations
+        calculateDailySavingsFV();
+        calculatePurchaseFV();
+        calculateMoneyDouble();
+    </script>
+</body>
+</html>
