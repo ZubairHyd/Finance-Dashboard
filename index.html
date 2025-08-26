@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- React & Babel for in-browser JSX transformation -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Card hover and loading animations */
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            animation: fade-in 0.5s ease-out forwards;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 25px -5px var(--glow-color, rgba(0, 0, 0, 0.1));
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 antialiased">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Card Component
+        const Card = ({ href, icon, title, borderColor, animationDelay, glowColor }) => {
+            
+            return (
+                <a 
+                    href={href} 
+                    className={`dashboard-card bg-white p-8 rounded-xl border border-slate-200 shadow-md flex flex-col items-center justify-center text-center`}
+                    style={{ 
+                        animationDelay,
+                        '--glow-color': glowColor
+                    }}
+                >
+                    <div className={`p-3 rounded-lg mb-4 border border-${borderColor}-200 bg-${borderColor}-100`}>
+                        {icon}
+                    </div>
+                    <h2 className="text-xl font-semibold text-slate-800">{title}</h2>
+                </a>
+            );
+        };
+        
+        // Main App Component
+        const App = () => {
+            // Icon components
+            const PersonalIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            );
+            const BusinessIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
+                    <path d="M3 21h18" />
+                    <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16" />
+                    <path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4" />
+                    <path d="M9 3v1" />
+                    <path d="M15 3v1" />
+                </svg>
+            );
+            const IslamicIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                    <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.5 5.5 0 0 1 12 13.5 5.5 5.5 0 0 1 6.5 8c0-1.7.78-3.22 2-4.24A9.04 9.04 0 0 0 12 3z" />
+                </svg>
+            );
+
+            return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+                    <header className="text-center mb-12">
+                        <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-red-600 to-green-600">
+                            Finance Dashboard
+                        </h1>
+                        <p className="text-slate-600 mt-3 text-lg"> Finance Management Command Centre. </p>
+                    </header>
+
+                    <main className="w-full max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <Card 
+                                href="#personal"
+                                icon={<PersonalIcon />}
+                                title="Personal Finance"
+                                borderColor="blue"
+                                animationDelay="0.1s"
+                                glowColor="rgba(59, 130, 246, 0.2)"
+                            />
+                            <Card 
+                                href="#business"
+                                icon={<BusinessIcon />}
+                                title="Business Finance"
+                                borderColor="red"
+                                animationDelay="0.2s"
+                                glowColor="rgba(239, 68, 68, 0.2)"
+                            />
+                            <Card 
+                                href="#islamic"
+                                icon={<IslamicIcon />}
+                                title="Islamic Finance"
+                                borderColor="green"
+                                animationDelay="0.3s"
+                                glowColor="rgba(34, 197, 94, 0.2)"
+                            />
+                        </div>
+                    </main>
+
+                    <footer className="text-center text-slate-500 mt-12">
+                        <p>&copy; 2025 Finance Dashboard by Zubair Uddin. All Rights Reserved.</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
